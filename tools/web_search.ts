@@ -1,12 +1,5 @@
-import { anthropic } from "@ai-sdk/anthropic"
-import { openai } from "@ai-sdk/openai"
+import { xai } from "@/lib/xai";
 
-export function getWebSearch(modelId: string) {
-  if (modelId.startsWith("openai/")) {
-    return openai.tools.webSearch()
-  }
-  if (modelId.startsWith("anthropic/")) {
-    return anthropic.tools.webSearch_20260209()
-  }
-  return undefined
+export function getWebSearch(_modelId: string) {
+  return xai.tools.webSearch();
 }

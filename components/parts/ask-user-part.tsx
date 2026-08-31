@@ -1,8 +1,8 @@
-import { type AskUserToolPart } from "@/tools"
+import { type AskUserToolPart } from "@/tools";
 
 export function AskUserPart({ part }: { part: AskUserToolPart }) {
   if (part.state !== "output-available") {
-    return null
+    return null;
   }
 
   return (
@@ -16,5 +16,5 @@ export function AskUserPart({ part }: { part: AskUserToolPart }) {
         ))}
       </ol>
     </div>
-  )
+  );
 }

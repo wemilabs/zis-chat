@@ -1,13 +1,13 @@
-import { GitForkIcon, StarIcon } from "lucide-react"
+import { GitForkIcon, StarIcon } from "lucide-react";
 
-import { type GithubRepoToolPart } from "@/tools"
-import { safeHttpUrl } from "@/lib/utils"
-import { Spinner } from "@/components/ui/spinner"
+import { type GithubRepoToolPart } from "@/tools";
+import { safeHttpUrl } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 const formatCount = new Intl.NumberFormat("en", {
   notation: "compact",
   maximumFractionDigits: 1,
-}).format
+}).format;
 
 export function GithubRepoPart({ part }: { part: GithubRepoToolPart }) {
   switch (part.state) {
@@ -18,12 +18,12 @@ export function GithubRepoPart({ part }: { part: GithubRepoToolPart }) {
           <Spinner />
           Looking up {part.input?.repo ?? "repository"}…
         </div>
-      )
+      );
     case "output-available":
       if ("error" in part.output) {
         return (
           <div className="text-sm text-destructive">{part.output.error}</div>
-        )
+        );
       }
       return (
         <a
@@ -45,14 +45,14 @@ export function GithubRepoPart({ part }: { part: GithubRepoToolPart }) {
           </span>
           <span>{part.output.language}</span>
         </a>
-      )
+      );
     case "output-error":
       return (
         <div className="text-sm text-destructive">
           Repository lookup failed: {part.errorText}
         </div>
-      )
+      );
     default:
-      return null
+      return null;
   }
 }

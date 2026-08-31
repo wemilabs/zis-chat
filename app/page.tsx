@@ -1,14 +1,18 @@
-import type { Metadata } from "next"
+import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { MODELS } from "@/lib/models"
-import { Chat } from "@/components/chat"
+import { Chat } from "@/components/chat";
+import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "Chat",
-  description:
-    "A chatbot template built using shadcn/ui, shadcn/react and shadcn/typeset, powered by the Vercel AI Gateway.",
-}
+  title: "Zis Chat | Fastest, smooth AI chat with web search",
+  description: "Powered by xAI Grok.",
+};
 
 export default function Page() {
-  return <Chat models={MODELS} />
+  return (
+    <Suspense fallback={null}>
+      <Chat models={MODELS} />
+    </Suspense>
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 const suggestions = [
   {
@@ -22,12 +22,12 @@ const suggestions = [
     prompt:
       "Help me plan a birthday dinner — ask me a few clarifying questions first, then suggest a menu.",
   },
-]
+];
 
 export function Suggestions({
   onSelect,
 }: {
-  onSelect: (prompt: string) => void
+  onSelect: (prompt: string) => void;
 }) {
   return (
     <div className="flex flex-wrap justify-center gap-2">
@@ -42,5 +42,5 @@ export function Suggestions({
         </Button>
       ))}
     </div>
-  )
+  );
 }

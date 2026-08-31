@@ -1,22 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useChat } from "@ai-sdk/react"
-import { lastAssistantMessageIsCompleteWithToolCalls } from "ai"
-import { type GatewayModel } from "@/lib/models"
-import { type ChatUIMessage } from "@/tools"
-import { ChatMessage } from "@/components/chat-message"
-import { PromptForm } from "@/components/prompt-form"
-import { QuestionCard } from "@/components/question-card"
-import { Suggestions } from "@/components/suggestions"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ChatMessage } from "@/components/chat-message";
+import { PromptForm } from "@/components/prompt-form";
+import { QuestionCard } from "@/components/question-card";
+import { Suggestions } from "@/components/suggestions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Empty,
   EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-} from "@/components/ui/empty"
+} from "@/components/ui/empty";
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -24,34 +19,39 @@ import {
   MessageScrollerItem,
   MessageScrollerProvider,
   MessageScrollerViewport,
-} from "@/components/ui/message-scroller"
+} from "@/components/ui/message-scroller";
+import { type ChatModel } from "@/lib/models";
+import { type ChatUIMessage } from "@/tools";
+import { useChat } from "@ai-sdk/react";
+import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
+import * as React from "react";
 
-export function Chat({ models }: { models: GatewayModel[] }) {
-  const [model, setModel] = React.useState(models[0]?.id ?? "")
+export function Chat({ models }: { models: ChatModel[] }) {
+  const [model, setModel] = React.useState(models[0]?.id ?? "");
 
   const { messages, sendMessage, status, stop, error, addToolOutput } =
     useChat<ChatUIMessage>({
       // Resume the conversation automatically once the user has answered the
       // ask_user questionnaire.
       sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-    })
+    });
 
   const resolvedModel = models.some((m) => m.id === model)
     ? model
-    : (models[0]?.id ?? "")
+    : (models[0]?.id ?? "");
 
-  const isBusy = status === "submitted" || status === "streaming"
+  const isBusy = status === "submitted" || status === "streaming";
 
-  const lastMessage = messages.at(-1)
+  const lastMessage = messages.at(-1);
   const pendingQuestion =
     lastMessage?.role === "assistant"
       ? lastMessage.parts.find(
           (part): part is Extract<typeof part, { type: "tool-ask_user" }> =>
             part.type === "tool-ask_user" &&
             (part.state === "input-streaming" ||
-              part.state === "input-available")
+              part.state === "input-available"),
         )
-      : undefined
+      : undefined;
 
   return (
     <div className="mx-auto flex min-h-0 w-full flex-1 flex-col">
@@ -61,8 +61,7 @@ export function Chat({ models }: { models: GatewayModel[] }) {
             <EmptyHeader>
               <EmptyTitle>What can I help with?</EmptyTitle>
               <EmptyDescription>
-                Pick a model and start chatting. Responses stream through the
-                Vercel AI Gateway.
+                Pick a model and start chatting. Responses stream from Grok.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
@@ -70,7 +69,7 @@ export function Chat({ models }: { models: GatewayModel[] }) {
                 onSelect={(prompt) =>
                   sendMessage(
                     { text: prompt },
-                    { body: { model: resolvedModel } }
+                    { body: { model: resolvedModel } },
                   )
                 }
               />
@@ -140,5 +139,5 @@ export function Chat({ models }: { models: GatewayModel[] }) {
         />
       </div>
     </div>
-  )
+  );
 }

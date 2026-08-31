@@ -5,59 +5,60 @@ import {
   streamText,
   toUIMessageStream,
   validateUIMessages,
-} from "ai"
+} from "ai";
 
-import { DEFAULT_MODEL, isModelAllowed } from "@/lib/models"
-import { getTools, type ChatUIMessage } from "@/tools"
+import { DEFAULT_MODEL, isModelAllowed } from "@/lib/models";
+import { getModel } from "@/lib/xai";
+import { getTools, type ChatUIMessage } from "@/tools";
 
-export const maxDuration = 30
+export const maxDuration = 30;
 
-const MAX_OUTPUT_TOKENS = 8192
+const MAX_OUTPUT_TOKENS = 8192;
 
-// This endpoint is public and spends your AI Gateway credits on every request.
+// This endpoint is public and spends your xAI credits on every request.
 // Before exposing it to real traffic, add a rate limit (e.g. Vercel Firewall /
-// WAF or @upstash/ratelimit), authentication, and an AI Gateway spend limit.
+// WAF or @upstash/ratelimit), authentication, and an xAI spend limit.
 // See the README "Security" section.
 export async function POST(req: Request) {
-  let body: unknown
+  let body: unknown;
   try {
-    body = await req.json()
+    body = await req.json();
   } catch {
-    return Response.json({ error: "Invalid JSON body." }, { status: 400 })
+    return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const model = (body as { model?: unknown })?.model
-  const modelId = typeof model === "string" ? model : DEFAULT_MODEL
+  const model = (body as { model?: unknown })?.model;
+  const modelId = typeof model === "string" ? model : DEFAULT_MODEL;
 
   if (!isModelAllowed(modelId)) {
     return Response.json(
       { error: `Model ${modelId} is not available.` },
-      { status: 400 }
-    )
+      { status: 400 },
+    );
   }
 
-  const tools = getTools(modelId)
+  const tools = getTools(modelId);
 
   // Validate the shape of every message and tool part before trusting it.
-  let messages: ChatUIMessage[]
+  let messages: ChatUIMessage[];
   try {
     const validated = await validateUIMessages<ChatUIMessage>({
       messages: (body as { messages?: unknown })?.messages,
       tools: tools as Parameters<typeof validateUIMessages>[0]["tools"],
-    })
-    messages = validated
+    });
+    messages = validated;
   } catch {
-    return Response.json({ error: "Invalid messages." }, { status: 400 })
+    return Response.json({ error: "Invalid messages." }, { status: 400 });
   }
 
   const result = streamText({
-    model: modelId,
+    model: getModel(modelId),
     messages: await convertToModelMessages(messages),
     tools,
     stopWhen: isStepCount(5),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
     abortSignal: req.signal,
-  })
+  });
 
   return createUIMessageStreamResponse({
     stream: toUIMessageStream({
@@ -65,5 +66,5 @@ export async function POST(req: Request) {
       sendSources: true,
       onError: () => "Something went wrong. Please try again.",
     }),
-  })
+  });
 }

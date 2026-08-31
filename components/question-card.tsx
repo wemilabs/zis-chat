@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { type AskUserToolPart } from "@/tools"
+import { type AskUserToolPart } from "@/tools";
 import {
   Questionnaire,
   QuestionnaireActions,
@@ -14,19 +14,20 @@ import {
   QuestionnaireProgress,
   QuestionnaireSubmit,
   QuestionnaireTitle,
-} from "@/components/ui/questionnaire"
+} from "@/components/ui/questionnaire";
 
 export function QuestionCard({
   part,
   onAnswer,
 }: {
-  part: AskUserToolPart
+  part: AskUserToolPart;
   onAnswer: (
     toolCallId: string,
-    answers: { question: string; answer: string }[]
-  ) => void
+    answers: { question: string; answer: string }[],
+  ) => void;
 }) {
-  const questions = part.state === "input-available" ? part.input.questions : []
+  const questions =
+    part.state === "input-available" ? part.input.questions : [];
 
   return (
     <div className="sticky bottom-2 isolate z-50 mx-auto w-full max-w-2xl px-6 pt-2">
@@ -45,15 +46,15 @@ export function QuestionCard({
               required: true,
             }))}
             onSubmit={(event) => {
-              event.preventDefault()
-              const formData = new FormData(event.currentTarget)
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
               onAnswer(
                 part.toolCallId,
                 questions.map((question, index) => ({
                   question: question.question,
                   answer: String(formData.get(`q${index}`) ?? ""),
-                }))
-              )
+                })),
+              );
             }}
           >
             {questions.length > 1 && (
@@ -85,5 +86,5 @@ export function QuestionCard({
         )}
       </div>
     </div>
-  )
+  );
 }

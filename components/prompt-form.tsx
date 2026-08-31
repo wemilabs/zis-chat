@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ArrowUpIcon, SquareIcon } from "lucide-react"
+import { ArrowUpIcon, SquareIcon } from "lucide-react";
+import * as React from "react";
 
-import { type GatewayModel } from "@/lib/models"
-import { ModelSelect } from "@/components/model-select"
+import { ModelSelect } from "@/components/model-select";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupTextarea,
-} from "@/components/ui/input-group"
+} from "@/components/ui/input-group";
+import { type ChatModel } from "@/lib/models";
 
 export function PromptForm({
   models,
@@ -20,21 +20,21 @@ export function PromptForm({
   onSubmit,
   onStop,
 }: {
-  models: GatewayModel[]
-  model: string
-  onModelChange: (model: string) => void
-  isBusy: boolean
-  onSubmit: (text: string) => void
-  onStop: () => void
+  models: ChatModel[];
+  model: string;
+  onModelChange: (model: string) => void;
+  isBusy: boolean;
+  onSubmit: (text: string) => void;
+  onStop: () => void;
 }) {
-  const [input, setInput] = React.useState("")
+  const [input, setInput] = React.useState("");
 
   function handleSubmit(event?: React.FormEvent) {
-    event?.preventDefault()
-    const text = input.trim()
-    if (!text || isBusy) return
-    onSubmit(text)
-    setInput("")
+    event?.preventDefault();
+    const text = input.trim();
+    if (!text || isBusy) return;
+    onSubmit(text);
+    setInput("");
   }
 
   return (
@@ -51,8 +51,8 @@ export function PromptForm({
               !event.shiftKey &&
               !event.nativeEvent.isComposing
             ) {
-              event.preventDefault()
-              handleSubmit()
+              event.preventDefault();
+              handleSubmit();
             }
           }}
         />
@@ -88,5 +88,5 @@ export function PromptForm({
         </InputGroupAddon>
       </InputGroup>
     </form>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { tool } from "ai"
-import { z } from "zod"
+import { tool } from "ai";
+import { z } from "zod";
 
 export const askUser = tool({
   description:
@@ -13,7 +13,7 @@ export const askUser = tool({
             .array(z.string())
             .length(3)
             .describe("Exactly three short answer choices"),
-        })
+        }),
       )
       .min(1)
       .describe("The questions to ask the user"),
@@ -21,4 +21,4 @@ export const askUser = tool({
   outputSchema: z
     .array(z.object({ question: z.string(), answer: z.string() }))
     .describe("The user's answer to each question"),
-})
+});

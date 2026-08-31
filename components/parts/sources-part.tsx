@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { ArrowUpRightIcon, GlobeIcon } from "lucide-react"
+import { ArrowUpRightIcon, GlobeIcon } from "lucide-react";
 
-import { type ChatMessagePart, type SourceUrlPart } from "@/tools"
-import { safeHttpUrl } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { type ChatMessagePart, type SourceUrlPart } from "@/tools";
+import { safeHttpUrl } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -12,7 +12,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 import {
   Item,
   ItemActions,
@@ -20,7 +20,7 @@ import {
   ItemDescription,
   ItemGroup,
   ItemTitle,
-} from "@/components/ui/item"
+} from "@/components/ui/item";
 
 function getUniqueSources(parts: ChatMessagePart[]): SourceUrlPart[] {
   return parts
@@ -28,27 +28,27 @@ function getUniqueSources(parts: ChatMessagePart[]): SourceUrlPart[] {
     .filter((source) => safeHttpUrl(source.url))
     .filter(
       (source, index, all) =>
-        all.findIndex((other) => other.url === source.url) === index
-    )
+        all.findIndex((other) => other.url === source.url) === index,
+    );
 }
 
 function getHostname(url: string) {
   try {
-    return new URL(url).hostname
+    return new URL(url).hostname;
   } catch {
-    return url
+    return url;
   }
 }
 
 export function SourcesPart({ parts }: { parts: ChatMessagePart[] }) {
-  const sources = getUniqueSources(parts)
+  const sources = getUniqueSources(parts);
 
   if (sources.length === 0) {
-    return null
+    return null;
   }
 
-  const count = sources.length
-  const label = `Searched ${count} ${count === 1 ? "website" : "websites"}`
+  const count = sources.length;
+  const label = `Searched ${count} ${count === 1 ? "website" : "websites"}`;
 
   return (
     <div className="p-1">
@@ -67,8 +67,8 @@ export function SourcesPart({ parts }: { parts: ChatMessagePart[] }) {
           <div className="flex-1 scroll-fade-b overflow-y-auto p-4">
             <ItemGroup>
               {sources.map((source) => {
-                const hostname = getHostname(source.url)
-                const title = source.title || hostname
+                const hostname = getHostname(source.url);
+                const title = source.title || hostname;
 
                 return (
                   <Item
@@ -89,12 +89,12 @@ export function SourcesPart({ parts }: { parts: ChatMessagePart[] }) {
                       <ArrowUpRightIcon className="size-4" />
                     </ItemActions>
                   </Item>
-                )
+                );
               })}
             </ItemGroup>
           </div>
         </DrawerContent>
       </Drawer>
     </div>
-  )
+  );
 }

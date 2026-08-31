@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { type GatewayModel } from "@/lib/models"
 import {
   Select,
   SelectContent,
@@ -10,28 +9,29 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import type { ChatModel } from "@/lib/models";
 
 export function ModelSelect({
   models,
   value,
   onValueChange,
 }: {
-  models: GatewayModel[]
-  value: string
-  onValueChange: (value: string) => void
+  models: ChatModel[];
+  value: string;
+  onValueChange: (value: string) => void;
 }) {
   const items = React.useMemo(
     () => models.map((model) => ({ label: model.name, value: model.id })),
-    [models]
-  )
+    [models],
+  );
 
   return (
     <Select
       items={items}
       value={value}
       onValueChange={(next) => {
-        if (typeof next === "string") onValueChange(next)
+        if (typeof next === "string") onValueChange(next);
       }}
     >
       <SelectTrigger aria-label="Model" className="bg-background">
@@ -47,5 +47,5 @@ export function ModelSelect({
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }

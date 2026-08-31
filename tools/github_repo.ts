@@ -1,5 +1,5 @@
-import { tool } from "ai"
-import { z } from "zod"
+import { tool } from "ai";
+import { z } from "zod";
 
 export const githubRepo = tool({
   description:
@@ -23,20 +23,20 @@ export const githubRepo = tool({
     }),
   ]),
   execute: async ({ repo }, { abortSignal }) => {
-    const timeout = AbortSignal.timeout(5000)
+    const timeout = AbortSignal.timeout(5000);
     const signal = abortSignal
       ? AbortSignal.any([abortSignal, timeout])
-      : timeout
+      : timeout;
 
     try {
       const res = await fetch(`https://api.github.com/repos/${repo}`, {
         headers: { accept: "application/vnd.github+json" },
         signal,
-      })
+      });
       if (!res.ok) {
-        return { error: `Could not find repository ${repo}.` }
+        return { error: `Could not find repository ${repo}.` };
       }
-      const data = await res.json()
+      const data = await res.json();
       return {
         repo: String(data.full_name ?? repo),
         description: String(data.description ?? ""),
@@ -45,9 +45,9 @@ export const githubRepo = tool({
         openIssues: Number(data.open_issues_count ?? 0),
         language: String(data.language ?? "Unknown"),
         url: String(data.html_url ?? `https://github.com/${repo}`),
-      }
+      };
     } catch {
-      return { error: `Could not reach GitHub for ${repo}.` }
+      return { error: `Could not reach GitHub for ${repo}.` };
     }
   },
-})
+});
