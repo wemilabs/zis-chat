@@ -1,9 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
-import "./globals.css";
-import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import "./globals.css";
 
 const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -30,10 +30,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <div className="flex h-svh flex-col">
-            <SiteHeader />
-            {children}
-          </div>
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
