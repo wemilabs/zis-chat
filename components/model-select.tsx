@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import {
   Select,
   SelectContent,
@@ -21,10 +19,7 @@ export function ModelSelect({
   value: string;
   onValueChange: (value: string) => void;
 }) {
-  const items = React.useMemo(
-    () => models.map((model) => ({ label: model.name, value: model.id })),
-    [models],
-  );
+  const items = models.map((model) => ({ label: model.name, value: model.id }));
 
   return (
     <Select

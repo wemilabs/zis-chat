@@ -1,5 +1,10 @@
 "use client";
 
+import { useChat } from "@ai-sdk/react";
+import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
+import { useRouter } from "next/navigation";
+import * as React from "react";
+
 import { ChatMessage } from "@/components/chat-message";
 import { PromptForm } from "@/components/prompt-form";
 import { QuestionCard } from "@/components/question-card";
@@ -20,28 +25,48 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { type ChatModel } from "@/lib/models";
-import { type ChatUIMessage } from "@/tools";
-import { useChat } from "@ai-sdk/react";
-import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
-import * as React from "react";
+import { authClient } from "@/lib/auth-client";
+import type { ChatModel } from "@/lib/models";
+import type { ChatUIMessage } from "@/tools";
 
-export function Chat({ models }: { models: ChatModel[] }) {
-  const [model, setModel] = React.useState(models[0]?.id ?? "");
+export function Chat({
+  chatId,
+  initialMessages,
+  initialModel,
+  isNew = false,
+  models,
+}: {
+  chatId: string;
+  initialMessages: ChatUIMessage[];
+  initialModel: string;
+  isNew?: boolean;
+  models: ChatModel[];
+}) {
+  const router = useRouter();
+  const [model, setModel] = React.useState(initialModel);
+  const [sessionError, setSessionError] = React.useState<Error>();
+  const [isStarting, startTransition] = React.useTransition();
 
   const { messages, sendMessage, status, stop, error, addToolOutput } =
     useChat<ChatUIMessage>({
+      id: chatId,
+      messages: initialMessages,
+      onFinish: () => {
+        if (isNew) {
+          router.replace(`/chat/${chatId}`);
+          return;
+        }
+        router.refresh();
+      },
       // Resume the conversation automatically once the user has answered the
       // ask_user questionnaire.
       sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     });
 
-  const resolvedModel = models.some((m) => m.id === model)
+  const resolvedModel = models.some((item) => item.id === model)
     ? model
     : (models[0]?.id ?? "");
-
-  const isBusy = status === "submitted" || status === "streaming";
-
+  const isBusy = isStarting || status === "submitted" || status === "streaming";
   const lastMessage = messages.at(-1);
   const pendingQuestion =
     lastMessage?.role === "assistant"
@@ -52,6 +77,33 @@ export function Chat({ models }: { models: ChatModel[] }) {
               part.state === "input-available"),
         )
       : undefined;
+
+  function submitMessage(text: string) {
+    startTransition(async () => {
+      setSessionError(undefined);
+
+      try {
+        const session = await authClient.getSession();
+        if (!session.data) {
+          const anonymousSession = await authClient.signIn.anonymous();
+          if (anonymousSession.error) {
+            throw new Error(
+              anonymousSession.error.message ??
+                "Could not start guest session.",
+            );
+          }
+        }
+
+        await sendMessage({ text }, { body: { chatId, model: resolvedModel } });
+      } catch (cause) {
+        setSessionError(
+          cause instanceof Error ? cause : new Error("Could not send message."),
+        );
+      }
+    });
+  }
+
+  const requestError = sessionError ?? error;
 
   return (
     <div className="mx-auto flex min-h-0 w-full flex-1 flex-col">
@@ -65,14 +117,7 @@ export function Chat({ models }: { models: ChatModel[] }) {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Suggestions
-                onSelect={(prompt) =>
-                  sendMessage(
-                    { text: prompt },
-                    { body: { model: resolvedModel } },
-                  )
-                }
-              />
+              <Suggestions onSelect={submitMessage} />
             </EmptyContent>
           </Empty>
         </div>
@@ -109,7 +154,7 @@ export function Chat({ models }: { models: ChatModel[] }) {
                       tool: "ask_user",
                       toolCallId,
                       output: answer,
-                      options: { body: { model: resolvedModel } },
+                      options: { body: { chatId, model: resolvedModel } },
                     })
                   }
                 />
@@ -121,10 +166,10 @@ export function Chat({ models }: { models: ChatModel[] }) {
       )}
 
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-2 px-6 pb-6">
-        {error && (
+        {requestError && (
           <Alert variant="destructive">
             <AlertTitle>Request failed</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
+            <AlertDescription>{requestError.message}</AlertDescription>
           </Alert>
         )}
         <PromptForm
@@ -132,9 +177,7 @@ export function Chat({ models }: { models: ChatModel[] }) {
           model={resolvedModel}
           onModelChange={setModel}
           isBusy={isBusy}
-          onSubmit={(text) =>
-            sendMessage({ text }, { body: { model: resolvedModel } })
-          }
+          onSubmit={submitMessage}
           onStop={() => stop()}
         />
       </div>
