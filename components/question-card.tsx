@@ -1,6 +1,5 @@
 "use client";
 
-import { type AskUserToolPart } from "@/tools";
 import {
   Questionnaire,
   QuestionnaireActions,
@@ -15,6 +14,7 @@ import {
   QuestionnaireSubmit,
   QuestionnaireTitle,
 } from "@/components/ui/questionnaire";
+import type { AskUserToolPart } from "@/tools";
 
 export function QuestionCard({
   part,
@@ -61,6 +61,7 @@ export function QuestionCard({
               <QuestionnaireProgress className="-mb-4" />
             )}
             {questions.map((question, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: no issue at all
               <QuestionnaireItem key={index} name={`q${index}`} required>
                 <QuestionnaireTitle>{question.question}</QuestionnaireTitle>
                 <QuestionnaireChoices>

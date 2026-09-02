@@ -10,3 +10,7 @@ export const xai = createXai({
 export function getModel(id: string) {
   return xai(id);
 }
+
+export function getSpeechModel() {
+  return xai.speech();
+}
