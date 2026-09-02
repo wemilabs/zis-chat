@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
@@ -7,6 +8,20 @@ import { ChatShell } from "@/components/chat-shell";
 import { SavedChatSkeleton } from "@/components/loading-skeletons";
 import { getOwnedChat } from "@/lib/chats";
 import { MODELS } from "@/lib/models";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  if (!z.uuid().safeParse(id).success) return {};
+
+  const savedChat = await getOwnedChat(id);
+  if (!savedChat) return {};
+
+  return { title: savedChat.title };
+}
 
 export default function ChatPage({
   params,
