@@ -1,8 +1,8 @@
 import { GitForkIcon, StarIcon } from "lucide-react";
 
-import { type GithubRepoToolPart } from "@/tools";
-import { safeHttpUrl } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
+import { safeHttpUrl } from "@/lib/utils";
+import type { GithubRepoToolPart } from "@/tools";
 
 const formatCount = new Intl.NumberFormat("en", {
   notation: "compact",

@@ -16,8 +16,7 @@ const fontMono = Geist_Mono({
 const siteUrl = "https://zis-chat.vercel.app/";
 
 const title = "Zis Chat | AI chat with live web search";
-const description =
-  "Chat with xAI Grok. Streaming answers, live web search, tool calls, and clarifying questions. Built on the AI SDK and shadcn/ui.";
+const description = "Faster and efficient AI chat experience.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
