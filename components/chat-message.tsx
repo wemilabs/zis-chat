@@ -13,6 +13,7 @@ import {
   MessageFooter,
 } from "@/components/ui/message";
 import type { ChatUIMessage } from "@/tools";
+import { ImageGenerationPart } from "./parts/image-generation-part";
 
 export function ChatMessage({
   message,
@@ -57,6 +58,8 @@ export function ChatMessage({
               return <AskUserPart key={part.toolCallId} part={part} />;
             case "tool-web_search":
               return <WebSearchPart key={part.toolCallId} part={part} />;
+            case "tool-image_generation":
+              return <ImageGenerationPart key={part.toolCallId} part={part} />;
             default:
               return null;
           }
