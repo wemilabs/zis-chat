@@ -2,11 +2,13 @@ import type { InferUITools, UIDataTypes, UIMessage } from "ai";
 
 import { askUser } from "./ask_user";
 import { githubRepo } from "./github_repo";
+import { imageGeneration } from "./image_generation";
 import { getWebSearch } from "./web_search";
 
 const baseTools = {
   github_repo: githubRepo,
   ask_user: askUser,
+  image_generation: imageGeneration,
 };
 
 export function getTools(modelId: string) {
@@ -47,4 +49,9 @@ export type AskUserToolPart = Extract<
 export type WebSearchToolPart = Extract<
   ChatMessagePart,
   { type: "tool-web_search" }
+>;
+
+export type ImageGenerationToolPart = Extract<
+  ChatMessagePart,
+  { type: "tool-image_generation" }
 >;

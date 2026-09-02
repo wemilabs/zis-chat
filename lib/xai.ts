@@ -14,3 +14,7 @@ export function getModel(id: string) {
 export function getSpeechModel() {
   return xai.speech();
 }
+
+export function getImageModel() {
+  return xai.image("grok-imagine-image-2.0");
+}

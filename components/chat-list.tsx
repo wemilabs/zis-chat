@@ -74,7 +74,7 @@ export function ChatList({
             tooltip={chat.title}
             render={<Link href={`/chat/${chat.id}`} prefetch />}
           >
-            <span className="truncate">{chat.title}</span>
+            <span className="truncate text-sm">{chat.title}</span>
           </SidebarMenuButton>
           <ChatMenu
             chatId={chat.id}
