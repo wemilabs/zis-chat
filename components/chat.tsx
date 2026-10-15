@@ -8,6 +8,7 @@ import * as React from "react";
 import { ChatMessage } from "@/components/chat-message";
 import { PromptForm } from "@/components/prompt-form";
 import { QuestionCard } from "@/components/question-card";
+import { StatusIcon } from "@/components/status-icon";
 import { Suggestions } from "@/components/suggestions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -25,6 +26,8 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
+import { Message, MessageContent } from "@/components/ui/message";
+import { Trace, TraceIcon, TraceLine, TraceTitle } from "@/components/ui/trace";
 import { authClient } from "@/lib/auth-client";
 import type { ChatModel } from "@/lib/models";
 import type { ChatUIMessage } from "@/tools";
@@ -140,9 +143,18 @@ export function Chat({
                 ))}
                 {status === "submitted" && (
                   <MessageScrollerItem messageId="thinking">
-                    <div className="flex shimmer items-center gap-2 px-3 text-sm text-muted-foreground">
-                      Thinking…
-                    </div>
+                    <Message>
+                      <MessageContent>
+                        <Trace className="px-1.5">
+                          <TraceLine status="running">
+                            <TraceIcon>
+                              <StatusIcon status="running" />
+                            </TraceIcon>
+                            <TraceTitle>Thinking</TraceTitle>
+                          </TraceLine>
+                        </Trace>
+                      </MessageContent>
+                    </Message>
                   </MessageScrollerItem>
                 )}
               </MessageScrollerContent>
