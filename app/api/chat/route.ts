@@ -109,11 +109,42 @@ export async function POST(req: Request) {
     abortSignal: req.signal,
   });
 
+  // A reply after ask_user continues the last message, so keep its parts' durations.
+  const lastMessage = messages.at(-1);
+  const continued = lastMessage?.role === "assistant" ? lastMessage : undefined;
+  let reasoningCount =
+    continued?.parts.filter((part) => part.type === "reasoning").length ?? 0;
+  const reasoningDurations: Record<number, number> = {
+    ...continued?.metadata?.reasoningDurations,
+  };
+  const reasoningStarts = new Map<string, { index: number; time: number }>();
+
   return createUIMessageStreamResponse({
     stream: toUIMessageStream({
       stream: result.stream,
       originalMessages: messages,
       sendSources: true,
+      // The AI SDK does not time reasoning, so time each block here.
+      messageMetadata: ({ part }) => {
+        if (part.type === "reasoning-start") {
+          reasoningStarts.set(part.id, {
+            index: reasoningCount++,
+            time: Date.now(),
+          });
+        }
+        const start =
+          part.type === "reasoning-end"
+            ? reasoningStarts.get(part.id)
+            : undefined;
+
+        if (!start) {
+          return undefined;
+        }
+
+        reasoningDurations[start.index] = Date.now() - start.time;
+        // Send the whole map so each update stands on its own.
+        return { reasoningDurations: { ...reasoningDurations } };
+      },
       onEnd: async ({ messages: completedMessages }) => {
         await saveChatMessages({
           chatId,

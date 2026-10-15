@@ -1,13 +1,21 @@
 import { DownloadIcon, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
+import { StatusIcon } from "@/components/status-icon";
 import { buttonVariants } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  TraceCollapsible,
+  TraceCollapsibleContent,
+  TraceCollapsibleTrigger,
+  TraceIcon,
+  TraceLine,
+  TraceTitle,
+} from "@/components/ui/trace";
 import type { ImageGenerationToolPart } from "@/tools";
 
 function buildDownloadName(prompt: string): string {
@@ -22,6 +30,24 @@ function buildDownloadName(prompt: string): string {
   return `${slug || "image"}_${timestamp}.png`;
 }
 
+function ImageGenerationError({ message }: { message: string }) {
+  return (
+    <TraceCollapsible>
+      <TraceCollapsibleTrigger>
+        <TraceLine status="error">
+          <TraceIcon>
+            <StatusIcon status="error" />
+          </TraceIcon>
+          <TraceTitle>Failed to generate image</TraceTitle>
+        </TraceLine>
+      </TraceCollapsibleTrigger>
+      <TraceCollapsibleContent className="text-destructive">
+        {message}
+      </TraceCollapsibleContent>
+    </TraceCollapsible>
+  );
+}
+
 export function ImageGenerationPart({
   part,
 }: {
@@ -31,17 +57,19 @@ export function ImageGenerationPart({
     case "input-streaming":
     case "input-available":
       return (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Spinner />
-          Generating image
-          {part.input?.aspectRatio ? ` (${part.input.aspectRatio})` : ""}…
-        </div>
+        <TraceLine status="running">
+          <TraceIcon>
+            <StatusIcon status="running" />
+          </TraceIcon>
+          <TraceTitle>
+            Generating image
+            {part.input?.aspectRatio ? ` (${part.input.aspectRatio})` : ""}
+          </TraceTitle>
+        </TraceLine>
       );
     case "output-available": {
       if ("error" in part.output) {
-        return (
-          <div className="text-sm text-destructive">{part.output.error}</div>
-        );
+        return <ImageGenerationError message={part.output.error} />;
       }
       const aspectRatio =
         part.input?.aspectRatio?.replace(":", " / ") ?? "1 / 1";
@@ -88,11 +116,7 @@ export function ImageGenerationPart({
       );
     }
     case "output-error":
-      return (
-        <div className="text-sm text-destructive">
-          Image generation failed: {part.errorText}
-        </div>
-      );
+      return <ImageGenerationError message={part.errorText} />;
     default:
       return null;
   }

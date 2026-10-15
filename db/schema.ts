@@ -126,6 +126,7 @@ export const message = pgTable(
       .references(() => chat.id, { onDelete: "cascade" }),
     role: text("role").notNull(),
     parts: jsonb("parts").$type<ChatUIMessage["parts"]>().notNull(),
+    metadata: jsonb("metadata").$type<ChatUIMessage["metadata"]>(),
     position: integer("position").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
