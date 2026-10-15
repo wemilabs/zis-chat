@@ -109,12 +109,14 @@ export async function POST(req: Request) {
     abortSignal: req.signal,
   });
 
-  // A reply after ask_user continues the last message, so count its parts.
+  // A reply after ask_user continues the last message, so keep its parts' durations.
   const lastMessage = messages.at(-1);
+  const continued = lastMessage?.role === "assistant" ? lastMessage : undefined;
   let reasoningCount =
-    lastMessage?.role === "assistant"
-      ? lastMessage.parts.filter((part) => part.type === "reasoning").length
-      : 0;
+    continued?.parts.filter((part) => part.type === "reasoning").length ?? 0;
+  const reasoningDurations: Record<number, number> = {
+    ...continued?.metadata?.reasoningDurations,
+  };
   const reasoningStarts = new Map<string, { index: number; time: number }>();
 
   return createUIMessageStreamResponse({
@@ -130,7 +132,6 @@ export async function POST(req: Request) {
             time: Date.now(),
           });
         }
-
         const start =
           part.type === "reasoning-end"
             ? reasoningStarts.get(part.id)
@@ -140,9 +141,9 @@ export async function POST(req: Request) {
           return undefined;
         }
 
-        return {
-          reasoningDurations: { [start.index]: Date.now() - start.time },
-        };
+        reasoningDurations[start.index] = Date.now() - start.time;
+        // Send the whole map so each update stands on its own.
+        return { reasoningDurations: { ...reasoningDurations } };
       },
       onEnd: async ({ messages: completedMessages }) => {
         await saveChatMessages({
