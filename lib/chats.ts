@@ -91,6 +91,7 @@ export async function getOwnedChat(chatId: string) {
         id: stored.id,
         role: stored.role as ChatUIMessage["role"],
         parts: stored.parts,
+        ...(stored.metadata ? { metadata: stored.metadata } : {}),
       }),
     ),
   };
@@ -143,6 +144,7 @@ export async function saveChatMessages({
         chatId,
         role: item.role,
         parts: item.parts,
+        metadata: item.metadata ?? null,
         position,
       })
       .onConflictDoUpdate({
@@ -150,6 +152,7 @@ export async function saveChatMessages({
         set: {
           role: item.role,
           parts: item.parts,
+          metadata: item.metadata ?? null,
           position,
         },
       });
